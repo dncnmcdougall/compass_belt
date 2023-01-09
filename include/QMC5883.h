@@ -1,6 +1,7 @@
 #ifndef _qmc5883_H_
 #define _qmc5883_H_
 
+
 #include "Arduino.h"
 
 #include "Sensor.h"
@@ -57,6 +58,17 @@ public:
         QMC5883_RATIO_64 = 0b11 
     } qmc5883Ratio_t;
 
+typedef enum: uint8_t {
+    QMC5883_PLANE_XY_Z_UP,
+    QMC5883_PLANE_YZ_X_UP,
+    QMC5883_PLANE_ZX_Y_UP,
+
+    QMC5883_PLANE_XY_Z_DOWN,
+    QMC5883_PLANE_YZ_X_DOWN,
+    QMC5883_PLANE_ZX_Y_DOWN
+
+} qmc5883Plane_t;
+
 public:
     /*!
      * @param sensorID sensor ID, -1 by default
@@ -66,13 +78,38 @@ public:
     bool begin(bool setupWire=true); //!< @return Returns whether connection was successful
     bool setConfig(qmc5883Mode_t mode ,qmc5883Rate_t rate
                    ,qmc5883Range_t range ,qmc5883Ratio_t ratio);
-    bool read();
+
+    void startReading();
+    bool readingLoop();
+    void endReading();
+
+    void startCalibrating();
+    void calibrateLoop();
+    void endCalibrating();
+
+    void setAngleToHeading();
+
+    bool loadCalibration();
+    bool saveCalibration(int address) const;
+
+    float heading() const;
 
     float x, y, z, temperature;
 private:
     qmc5883Range_t _magRange;
     float _magGain_LSb_Gauss;
     int32_t _sensorID;
+
+    qmc5883Plane_t _plane;
+    int _readingCount;
+
+    int _calibrationCount;
+    float _minX, _maxX;
+    float _minY, _maxY;
+    float _minZ, _maxZ;
+    float _datumT;
+    float _angle;
+
 
 };
 

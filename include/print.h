@@ -1,4 +1,4 @@
 
 
-#define print(arg) if(Serial){Serial.print(arg);}
-#define println(arg) if(Serial){Serial.println(arg);}
+#define print(...) if(Serial){Serial.print(__VA_ARGS__);}
+#define println(...) if(Serial){Serial.println(__VA_ARGS__);}
